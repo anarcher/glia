@@ -1,0 +1,12 @@
+machine:
+    services:
+        - docker
+dependencies:
+    override:
+        - docker version
+        - docker info
+        - docker build -t anarcher/glia:$CIRCLE_SHA1 . 
+test:
+    override:
+        - docker run --entrypoint=go anarcher/glia:$CIRCLE_SHA1 test ./... -race
+
