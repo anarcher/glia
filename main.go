@@ -19,9 +19,9 @@ func MainAction(c *cli.Context) {
 	{
 		network := c.String("gmond_network")
 		addr := c.String("gmond")
-		flushCnt := c.Int("flushCnt")
+		bufSize := c.Int("buffer_size")
 		for i := 1; i < c.Int("fetcher"); i++ {
-			f := NewFetcher(ctx, network, addr, fetchSignal, metricCh, flushCnt)
+			f := NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize)
 			fetchers = append(fetchers, f)
 			WaitGroup.Add(1)
 		}
@@ -67,7 +67,7 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = "glia"
-	app.Usage = "It comes betwwen Gmond and Graphite"
+	app.Usage = "It comes between Gmond and Graphite"
 	app.Action = MainAction
 	app.Flags = []cli.Flag{
 		cli.IntFlag{
@@ -89,7 +89,7 @@ func main() {
 			EnvVar: "FETCH_INTERVAL",
 		},
 		cli.IntFlag{
-			Name:   "buffer_size,s",
+			Name:   "buffer_size,b",
 			Value:  1000,
 			Usage:  "The buffer size of sending (the number of metric line)",
 			EnvVar: "BUFFER_SIZE",
