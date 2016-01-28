@@ -1,0 +1,42 @@
+{
+	"ImportPath": "github.com/anarcher/glia",
+	"GoVersion": "go1.5.2",
+	"Deps": [
+		{
+			"ImportPath": "github.com/pusher/buddha/tcptest",
+			"Rev": "e71f661e1ccffa68a9b08f61b699d78002383a16"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "04b9de9b512f58addf28c9853d50ebef61c3953e"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html",
+			"Rev": "04b9de9b512f58addf28c9853d50ebef61c3953e"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding",
+			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
+		},
+		{
+			"ImportPath": "golang.org/x/text/internal/tag",
+			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
+		},
+		{
+			"ImportPath": "golang.org/x/text/internal/utf8internal",
+			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
+		},
+		{
+			"ImportPath": "golang.org/x/text/language",
+			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
+		},
+		{
+			"ImportPath": "golang.org/x/text/runes",
+			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
+		},
+		{
+			"ImportPath": "golang.org/x/text/transform",
+			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
+		}
+	]
+}
