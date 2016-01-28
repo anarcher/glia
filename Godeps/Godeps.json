@@ -3,6 +3,15 @@
 	"GoVersion": "go1.5.2",
 	"Deps": [
 		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-193-gf9cc300",
+			"Rev": "f9cc3001e04f9783cb4ad08ca6791aa07134787c"
+		},
+		{
+			"ImportPath": "github.com/go-kit/kit/log",
+			"Rev": "604df6092b6cb325976e60ef007a17d43518b0ba"
+		},
+		{
 			"ImportPath": "github.com/pusher/buddha/tcptest",
 			"Rev": "e71f661e1ccffa68a9b08f61b699d78002383a16"
 		},
@@ -37,6 +46,15 @@
 		{
 			"ImportPath": "golang.org/x/text/transform",
 			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
+		},
+		{
+			"ImportPath": "gopkg.in/logfmt.v0",
+			"Rev": "c50dc9aa845e681529d8e49d3dc11ec0195aacac"
+		},
+		{
+			"ImportPath": "gopkg.in/stack.v1",
+			"Comment": "v1.4.0",
+			"Rev": "0585967eab0016c8e4e2d55ac20585b469574cec"
 		}
 	]
 }
