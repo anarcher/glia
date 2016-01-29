@@ -13,7 +13,7 @@ import (
 func testFetch(t *testing.T, fixture string) {
 	ts := tcptest.NewServer(func(conn net.Conn) {
 		defer conn.Close()
-		conn.Write([]byte(sample1))
+		conn.Write([]byte(fixture))
 	})
 	defer ts.Close()
 
@@ -26,7 +26,8 @@ func testFetch(t *testing.T, fixture string) {
 	NewFetcher(ctx, "tcp", ts.Addr.String(),
 		fetchSignal,
 		metricCh,
-		fetchCnt)
+		fetchCnt,
+		"test")
 
 	fetchSignal <- struct{}{}
 
@@ -43,6 +44,7 @@ func testFetch(t *testing.T, fixture string) {
 			if len(parts) != 3 {
 				t.Errorf("metric format is wrong m:%v", string(m))
 			}
+			t.Logf("%v", string(m))
 		}
 
 		wg.Done()

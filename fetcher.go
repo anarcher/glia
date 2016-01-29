@@ -10,24 +10,27 @@ import (
 )
 
 type Fetcher struct {
-	ctx       context.Context
-	network   string
-	addr      string
-	conn      net.Conn
-	connected bool
-	flushCnt  int
+	ctx            context.Context
+	network        string
+	addr           string
+	conn           net.Conn
+	connected      bool
+	flushCnt       int
+	graphitePrefix string
 }
 
 func NewFetcher(ctx context.Context,
 	network, addr string,
 	fetchSignal chan struct{}, metricCh chan []byte,
-	flushCnt int) *Fetcher {
+	flushCnt int,
+	graphitePrefix string) *Fetcher {
 
 	fetcher := &Fetcher{
-		ctx:      ctx,
-		network:  network,
-		addr:     addr,
-		flushCnt: flushCnt,
+		ctx:            ctx,
+		network:        network,
+		addr:           addr,
+		flushCnt:       flushCnt,
+		graphitePrefix: graphitePrefix,
 	}
 
 	go fetcher.looper(fetchSignal, metricCh)

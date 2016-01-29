@@ -33,6 +33,7 @@ func (f *Fetcher) fetch(metricCh chan []byte, metrics, mb *bytes.Buffer) error {
 
 	idx := 0
 	var namespaces [][]byte
+	namespaces = append(namespaces, []byte(f.graphitePrefix))
 
 	for {
 		t, err := decoder.Token()

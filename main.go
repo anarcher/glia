@@ -22,8 +22,9 @@ func MainAction(c *cli.Context) {
 		network := c.String("gmond_network")
 		addr := c.String("gmond")
 		bufSize := c.Int("buffer_size")
+		graphitePrefix := c.String("graphite_prefix")
 		for i := 1; i < c.Int("fetcher"); i++ {
-			f := NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize)
+			f := NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize, graphitePrefix)
 			fetchers = append(fetchers, f)
 			WaitGroup.Add(1)
 		}
@@ -122,6 +123,12 @@ func main() {
 			Value:  "tcp",
 			Usage:  "The network of graphite carbon",
 			EnvVar: "GRAPHITE_NETWORK",
+		},
+		cli.StringFlag{
+			Name:   "graphite_prefix,p",
+			Value:  "ganglia",
+			Usage:  "The prefix to prepend to the metric names exported",
+			EnvVar: "GRAPHITE_PREFIX",
 		},
 	}
 	app.Run(os.Args)
