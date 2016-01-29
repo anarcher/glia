@@ -62,6 +62,8 @@ func MainAction(c *cli.Context) {
 				}
 			}
 		}()
+
+		fetchSignal <- struct{}{} // Start on
 	}
 
 	WaitGroup.Wait()

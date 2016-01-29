@@ -71,10 +71,6 @@ func (f *Fetcher) ConnectIfNot() error {
 }
 
 func (f *Fetcher) looper(fetchSignal chan struct{}, metricCh chan []byte) {
-	if f.connected == false {
-		f.Connect()
-	}
-
 	var (
 		metrics bytes.Buffer
 		mb      bytes.Buffer
@@ -92,10 +88,10 @@ L:
 			if err := f.ConnectIfNot(); err == nil {
 				if err := f.fetch(metricCh, &metrics, &mb); err != nil {
 					Logger.Log("fetch", "err", "err", err)
-					f.Disconnect()
 				}
 				Logger.Log("fetch", "done", "elapsed", fmt.Sprintf("%s", time.Since(st)))
 			}
+			f.Disconnect()
 		}
 	}
 

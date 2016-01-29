@@ -35,56 +35,63 @@ func (f *Fetcher) fetch(metricCh chan []byte, metrics, mb *bytes.Buffer) error {
 	var namespaces [][]byte
 	namespaces = append(namespaces, []byte(f.graphitePrefix))
 
+L:
 	for {
-		t, err := decoder.Token()
-		if t == nil {
-			break
-		}
-		if err != nil {
-			Logger.Log("fetch", "xml", "err", err)
-			return err
-		}
+		select {
+		case <-f.ctx.Done():
+			break L
+		default:
 
-		switch se := t.(type) {
-		case xml.StartElement:
-			switch se.Name.Local {
-			case TAG_CLUSTER:
-				for _, attr := range se.Attr {
-					if attr.Name.Local == ATTR_NAME {
-						namespaces = append(namespaces, []byte(attr.Value))
+			t, err := decoder.Token()
+			if t == nil {
+				break L
+			}
+			if err != nil {
+				Logger.Log("fetch", "xml", "err", err)
+				return err
+			}
+
+			switch se := t.(type) {
+			case xml.StartElement:
+				switch se.Name.Local {
+				case TAG_CLUSTER:
+					for _, attr := range se.Attr {
+						if attr.Name.Local == ATTR_NAME {
+							namespaces = append(namespaces, []byte(attr.Value))
+						}
+					}
+				case TAG_HOST:
+					for _, attr := range se.Attr {
+						if attr.Name.Local == ATTR_NAME {
+							namespaces = append(namespaces, []byte(attr.Value))
+						}
+					}
+				case TAG_METRIC:
+					metric := makeMetric(&se, mb, namespaces, tsstr)
+					if len(metric) > 0 {
+						metrics.Write(metric)
+						metrics.WriteString("\n")
+						idx++
 					}
 				}
-			case TAG_HOST:
-				for _, attr := range se.Attr {
-					if attr.Name.Local == ATTR_NAME {
-						namespaces = append(namespaces, []byte(attr.Value))
-					}
-				}
-			case TAG_METRIC:
-				metric := makeMetric(&se, mb, namespaces, tsstr)
-				if len(metric) > 0 {
-					metrics.Write(metric)
-					metrics.WriteString("\n")
-					idx++
+
+			case xml.EndElement:
+				if se.Name.Local == TAG_CLUSTER || se.Name.Local == TAG_HOST {
+					namespaces = namespaces[:len(namespaces)-1]
+				} else if se.Name.Local == TAG_METRIC {
+					mb.Reset()
 				}
 			}
 
-		case xml.EndElement:
-			if se.Name.Local == TAG_CLUSTER || se.Name.Local == TAG_HOST {
-				namespaces = namespaces[:len(namespaces)-1]
-			} else if se.Name.Local == TAG_METRIC {
-				mb.Reset()
+			if idx >= f.flushCnt {
+				bs := make([]byte, metrics.Len())
+				if _, err := metrics.Read(bs); err != nil {
+					Logger.Log("err", err)
+				}
+				metricCh <- bs
+				metrics.Reset()
+				idx = 0
 			}
-		}
-
-		if idx >= f.flushCnt {
-			bs := make([]byte, metrics.Len())
-			if _, err := metrics.Read(bs); err != nil {
-				Logger.Log("err", err)
-			}
-			metricCh <- bs
-			metrics.Reset()
-			idx = 0
 		}
 	}
 
