@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net"
 
 	"golang.org/x/net/context"
@@ -43,6 +42,7 @@ func (s *Sender) Connect() error {
 func (s *Sender) Disconnect() error {
 	if s.connected == true && s.conn != nil {
 		if err := s.conn.Close(); err != nil {
+			Logger.Log("sender", "disconnect", "err", err)
 			return err
 		}
 		s.connected = false
@@ -50,13 +50,14 @@ func (s *Sender) Disconnect() error {
 	return nil
 }
 
-func (s *Sender) ConnectIfNot() {
+func (s *Sender) ConnectIfNot() error {
 	if s.connected == false || s.conn == nil {
 		if err := s.Connect(); err != nil {
-			//TODO: LOG
-			log.Printf("Fetch connection error: %v", err)
+			Logger.Log("sender", "connection", "err", err)
+			return err
 		}
 	}
+	return nil
 }
 
 func (s *Sender) looper(metricCh chan []byte) {
@@ -66,14 +67,16 @@ L:
 		case <-s.ctx.Done():
 			break L
 		case metrics := <-metricCh:
-			s.ConnectIfNot()
-			if _, err := s.conn.Write(metrics); err != nil {
-				log.Printf("Sender: write err: %v", err)
+			if err := s.ConnectIfNot(); err == nil {
+				if _, err := s.conn.Write(metrics); err != nil {
+					Logger.Log("sender", "write", "err", err)
+					s.Disconnect()
+				}
 			}
 		}
 	}
 
-	if err := s.Disconnect(); err != nil {
-		log.Printf("Sender: disconnect err: %v", err)
-	}
+	s.Disconnect()
+	WaitGroup.Done()
+	Logger.Log("sender", "done")
 }

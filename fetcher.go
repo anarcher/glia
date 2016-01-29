@@ -4,8 +4,9 @@ import (
 	"golang.org/x/net/context"
 
 	"bytes"
-	"log"
+	"fmt"
 	"net"
+	"time"
 )
 
 type Fetcher struct {
@@ -48,6 +49,7 @@ func (f *Fetcher) Connect() error {
 func (f *Fetcher) Disconnect() error {
 	if f.connected == true && f.conn != nil {
 		if err := f.conn.Close(); err != nil {
+			Logger.Log("fetcher", "disconnect", "err", err)
 			return err
 		}
 		f.connected = false
@@ -55,13 +57,14 @@ func (f *Fetcher) Disconnect() error {
 	return nil
 }
 
-func (f *Fetcher) ConnectIfNot() {
+func (f *Fetcher) ConnectIfNot() error {
 	if f.connected == false || f.conn == nil {
 		if err := f.Connect(); err != nil {
-			//TODO: LOG
-			log.Printf("Fetch connection error: %v", err)
+			Logger.Log("fetcher", "connect", "err", err)
+			return err
 		}
 	}
+	return nil
 }
 
 func (f *Fetcher) looper(fetchSignal chan struct{}, metricCh chan []byte) {
@@ -81,17 +84,20 @@ L:
 			break L
 
 		case <-fetchSignal:
-			log.Println("Got fetchSignal")
-			f.ConnectIfNot()
-			if err := f.fetch(metricCh, &metrics, &mb); err != nil {
-				log.Printf("Fetch error: %v", err)
+			st := time.Now()
+			if err := f.ConnectIfNot(); err == nil {
+				if err := f.fetch(metricCh, &metrics, &mb); err != nil {
+					Logger.Log("fetch", "err", "err", err)
+					f.Disconnect()
+				}
+				Logger.Log("fetch", "done", "elapsed", fmt.Sprintf("%s", time.Since(st)))
 			}
 		}
 	}
 
-	if err := f.Disconnect(); err != nil {
-		log.Printf("Fetcher disconnect: %v", err)
-	}
+	f.Disconnect()
+	WaitGroup.Done()
+	Logger.Log("fetcher", "done")
 }
 
 // And fetch.go

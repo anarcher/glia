@@ -4,11 +4,13 @@ import (
 	"github.com/codegangsta/cli"
 	"golang.org/x/net/context"
 
+	"fmt"
 	"os"
 	"time"
 )
 
 func MainAction(c *cli.Context) {
+	Logger.Log("glia", "start", "version", Version)
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	Shutdown(cancelFunc)
 
@@ -54,6 +56,7 @@ func MainAction(c *cli.Context) {
 				case <-ctx.Done():
 					break L
 				case <-tick:
+					Logger.Log("fetch", "event", "fire", true)
 					fetchSignal <- struct{}{}
 				}
 			}
@@ -61,6 +64,7 @@ func MainAction(c *cli.Context) {
 	}
 
 	WaitGroup.Wait()
+	Logger.Log("glia", "end")
 }
 
 func main() {
@@ -69,6 +73,7 @@ func main() {
 	app.Name = "glia"
 	app.Usage = "It comes between Gmond and Graphite"
 	app.Action = MainAction
+	app.Version = fmt.Sprintf("%s (%s)", Version, GitCommit)
 	app.Flags = []cli.Flag{
 		cli.IntFlag{
 			Name:   "fetcher,f",

@@ -6,7 +6,6 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/xml"
-	"log"
 	"strconv"
 	"time"
 )
@@ -41,7 +40,8 @@ func (f *Fetcher) fetch(metricCh chan []byte, metrics, mb *bytes.Buffer) error {
 			break
 		}
 		if err != nil {
-			log.Printf("XML error:%v", err)
+			Logger.Log("fetch", "xml", "err", err)
+			return err
 		}
 
 		switch se := t.(type) {
