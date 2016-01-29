@@ -23,7 +23,7 @@ func MainAction(c *cli.Context) {
 		addr := c.String("gmond")
 		bufSize := c.Int("buffer_size")
 		graphitePrefix := c.String("graphite_prefix")
-		for i := 1; i < c.Int("fetcher"); i++ {
+		for i := 0; i < c.Int("fetcher"); i++ {
 			f := NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize, graphitePrefix)
 			fetchers = append(fetchers, f)
 			WaitGroup.Add(1)
@@ -34,7 +34,7 @@ func MainAction(c *cli.Context) {
 	{
 		network := c.String("graphtie_network")
 		addr := c.String("graphite")
-		for i := 1; i < c.Int("fetcher"); i++ {
+		for i := 0; i < c.Int("fetcher"); i++ {
 			s := NewSender(ctx, network, addr, metricCh)
 			senders = append(senders, s)
 			WaitGroup.Add(1)

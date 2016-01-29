@@ -76,8 +76,8 @@ func (f *Fetcher) looper(fetchSignal chan struct{}, metricCh chan []byte) {
 	}
 
 	var (
-		mb      bytes.Buffer
 		metrics bytes.Buffer
+		mb      bytes.Buffer
 	)
 
 L:
@@ -87,6 +87,7 @@ L:
 			break L
 
 		case <-fetchSignal:
+			Logger.Log("fetch", "start")
 			st := time.Now()
 			if err := f.ConnectIfNot(); err == nil {
 				if err := f.fetch(metricCh, &metrics, &mb); err != nil {

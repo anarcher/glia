@@ -78,14 +78,22 @@ func (f *Fetcher) fetch(metricCh chan []byte, metrics, mb *bytes.Buffer) error {
 		}
 
 		if idx >= f.flushCnt {
-			metricCh <- metrics.Bytes()
+			bs := make([]byte, metrics.Len())
+			if _, err := metrics.Read(bs); err != nil {
+				Logger.Log("err", err)
+			}
+			metricCh <- bs
 			metrics.Reset()
 			idx = 0
 		}
 	}
 
 	if metrics.Len() > 0 {
-		metricCh <- metrics.Bytes()
+		bs := make([]byte, metrics.Len())
+		if _, err := metrics.Read(bs); err != nil {
+			Logger.Log("err", err)
+		}
+		metricCh <- bs
 		metrics.Reset()
 	}
 
@@ -105,7 +113,11 @@ func makeMetric(el *xml.StartElement, mb *bytes.Buffer, ns [][]byte, ts string) 
 			mb.WriteString(ts)
 		} else if attr.Name.Local == ATTR_TYPE {
 			if attr.Value != TYPE_VAL_STRING && attr.Value != "" {
-				return mb.Bytes()
+				bs := make([]byte, mb.Len())
+				if _, err := mb.Read(bs); err != nil {
+					Logger.Log("err", err)
+				}
+				return bs
 			}
 		}
 	}
