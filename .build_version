@@ -1,0 +1,12 @@
+#!/bin/bash
+
+SHA=$(git rev-parse HEAD)
+TAG=$(git show-ref --tags | grep $SHA | sed "s/$SHA refs\/tags\///")
+
+echo "SHA: $SHA"
+
+if [ ! -z "$TAG" ]; then
+    echo "TAG: $TAG"
+    echo $TAG > ./VERSION
+fi
+
