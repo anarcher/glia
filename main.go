@@ -10,7 +10,7 @@ import (
 )
 
 func MainAction(c *cli.Context) {
-	Logger.Log("glia", "start", "version", Version)
+	Logger.Log("glia", "start", "version", Version, "gitcommit", GitCommit)
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	Shutdown(cancelFunc)
 
