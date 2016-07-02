@@ -1,60 +1,111 @@
 {
 	"ImportPath": "github.com/anarcher/glia",
-	"GoVersion": "go1.5.2",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v72",
 	"Deps": [
 		{
 			"ImportPath": "github.com/codegangsta/cli",
-			"Comment": "1.2.0-193-gf9cc300",
-			"Rev": "f9cc3001e04f9783cb4ad08ca6791aa07134787c"
+			"Comment": "v1.18.0",
+			"Rev": "1efa31f08b9333f1bd4882d61f9d668a70cd902e"
 		},
 		{
 			"ImportPath": "github.com/go-kit/kit/log",
-			"Rev": "604df6092b6cb325976e60ef007a17d43518b0ba"
+			"Comment": "v0.1.0-23-g25020e2",
+			"Rev": "25020e24479c2f15209bbcbeb4ea990feb452609"
+		},
+		{
+			"ImportPath": "github.com/go-logfmt/logfmt",
+			"Comment": "v0.2.0-9-gd432719",
+			"Rev": "d4327190ff838312623b09bfeb50d7c93c8d9c1d"
+		},
+		{
+			"ImportPath": "github.com/go-stack/stack",
+			"Comment": "v1.5.2",
+			"Rev": "100eb0c0a9c5b306ca2fb4f165df21d80ada4b82"
+		},
+		{
+			"ImportPath": "github.com/kr/logfmt",
+			"Rev": "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 		},
 		{
 			"ImportPath": "github.com/pusher/buddha/tcptest",
-			"Rev": "e71f661e1ccffa68a9b08f61b699d78002383a16"
+			"Rev": "92da1919a5be9f7fbde089ef7e0aab7648e53780"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
-			"Rev": "04b9de9b512f58addf28c9853d50ebef61c3953e"
+			"Rev": "b400c2eff1badec7022a8c8f5bea058b6315eed7"
 		},
 		{
 			"ImportPath": "golang.org/x/net/html",
-			"Rev": "04b9de9b512f58addf28c9853d50ebef61c3953e"
+			"Rev": "b400c2eff1badec7022a8c8f5bea058b6315eed7"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html/atom",
+			"Rev": "b400c2eff1badec7022a8c8f5bea058b6315eed7"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html/charset",
+			"Rev": "b400c2eff1badec7022a8c8f5bea058b6315eed7"
 		},
 		{
 			"ImportPath": "golang.org/x/text/encoding",
-			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/charmap",
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/htmlindex",
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/internal",
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/internal/identifier",
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/japanese",
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/korean",
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/simplifiedchinese",
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/traditionalchinese",
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/unicode",
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
 		},
 		{
 			"ImportPath": "golang.org/x/text/internal/tag",
-			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
 		},
 		{
 			"ImportPath": "golang.org/x/text/internal/utf8internal",
-			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
 		},
 		{
 			"ImportPath": "golang.org/x/text/language",
-			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
 		},
 		{
 			"ImportPath": "golang.org/x/text/runes",
-			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
 		},
 		{
 			"ImportPath": "golang.org/x/text/transform",
-			"Rev": "6d3c22c4525a4da167968fa2479be5524d2e8bd0"
-		},
-		{
-			"ImportPath": "gopkg.in/logfmt.v0",
-			"Rev": "c50dc9aa845e681529d8e49d3dc11ec0195aacac"
-		},
-		{
-			"ImportPath": "gopkg.in/stack.v1",
-			"Comment": "v1.4.0",
-			"Rev": "0585967eab0016c8e4e2d55ac20585b469574cec"
+			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
 		}
 	]
 }
