@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/anarcher/glia/lib"
+
 	"github.com/codegangsta/cli"
 	"golang.org/x/net/context"
 
@@ -10,41 +12,41 @@ import (
 )
 
 func MainAction(c *cli.Context) {
-	Logger.Log("glia", "start", "version", Version, "gitcommit", GitCommit)
+	glia.Logger.Log("glia", "start", "version", Version, "gitcommit", GitCommit)
 	ctx, cancelFunc := context.WithCancel(context.Background())
-	Shutdown(cancelFunc)
+	glia.Shutdown(cancelFunc)
 
 	fetchSignal := make(chan struct{})
 	metricCh := make(chan []byte)
 
-	var fetchers []*Fetcher
+	var fetchers []*glia.Fetcher
 	{
 		network := c.String("gmond_network")
 		addr := c.String("gmond")
 		bufSize := c.Int("buffer_size")
 		graphitePrefix := c.String("graphite_prefix")
 		for i := 0; i < c.Int("fetcher"); i++ {
-			f := NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize, graphitePrefix)
+			f := glia.NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize, graphitePrefix)
 			fetchers = append(fetchers, f)
-			WaitGroup.Add(1)
+			glia.WaitGroup.Add(1)
 		}
 	}
 
-	var senders []*Sender
+	var senders []*glia.Sender
 	{
 		network := c.String("graphtie_network")
 		addr := c.String("graphite")
 		for i := 0; i < c.Int("fetcher"); i++ {
-			s := NewSender(ctx, network, addr, metricCh)
+			s := glia.NewSender(ctx, network, addr, metricCh)
 			senders = append(senders, s)
-			WaitGroup.Add(1)
+			glia.WaitGroup.Add(1)
 		}
 	}
 
 	{
 		interval, err := time.ParseDuration(c.String("fetch_interval"))
 		if err != nil {
-			Logger.Log("err", err)
+			glia.Logger.Log("err", err)
 			cancelFunc()
 			return
 		}
@@ -57,7 +59,7 @@ func MainAction(c *cli.Context) {
 				case <-ctx.Done():
 					break L
 				case <-tick:
-					Logger.Log("fetch", "event", "fire", true)
+					glia.Logger.Log("fetch", "event", "fire", true)
 					fetchSignal <- struct{}{}
 				}
 			}
@@ -66,8 +68,8 @@ func MainAction(c *cli.Context) {
 		fetchSignal <- struct{}{} // Start on
 	}
 
-	WaitGroup.Wait()
-	Logger.Log("glia", "end")
+	glia.WaitGroup.Wait()
+	glia.Logger.Log("glia", "end")
 }
 
 func main() {

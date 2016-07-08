@@ -1,4 +1,4 @@
-package main
+package glia
 
 import (
 	"golang.org/x/net/context"
