@@ -3,15 +3,15 @@ package main
 import (
 	"github.com/anarcher/glia/lib"
 
-	"github.com/codegangsta/cli"
 	"golang.org/x/net/context"
+	"gopkg.in/urfave/cli.v1"
 
 	"fmt"
 	"os"
 	"time"
 )
 
-func MainAction(c *cli.Context) {
+func MainAction(c *cli.Context) error {
 	glia.Logger.Log("glia", "start", "version", Version, "gitcommit", GitCommit)
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	glia.Shutdown(cancelFunc)
@@ -36,7 +36,7 @@ func MainAction(c *cli.Context) {
 	{
 		network := c.String("graphtie_network")
 		addr := c.String("graphite")
-		for i := 0; i < c.Int("fetcher"); i++ {
+		for i := 0; i < c.Int("sender"); i++ {
 			s := glia.NewSender(ctx, network, addr, metricCh)
 			senders = append(senders, s)
 			glia.WaitGroup.Add(1)
@@ -48,7 +48,7 @@ func MainAction(c *cli.Context) {
 		if err != nil {
 			glia.Logger.Log("err", err)
 			cancelFunc()
-			return
+			return err
 		}
 
 		go func() {
@@ -70,6 +70,8 @@ func MainAction(c *cli.Context) {
 
 	glia.WaitGroup.Wait()
 	glia.Logger.Log("glia", "end")
+
+	return nil
 }
 
 func main() {

@@ -60,7 +60,7 @@ func testFetch(t *testing.T, fixture []byte) {
 func Test_Fetcher(t *testing.T) {
 	samples := []string{"sample1.txt", "sample2.txt", "sample3.txt"}
 	for _, filename := range samples {
-		sample, _ := ioutil.ReadFile("./test/" + filename)
+		sample, _ := ioutil.ReadFile("../test/" + filename)
 		t.Logf("Testing %v", filename)
 		testFetch(t, sample)
 	}

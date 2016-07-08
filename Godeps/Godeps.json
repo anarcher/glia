@@ -4,11 +4,6 @@
 	"GodepVersion": "v72",
 	"Deps": [
 		{
-			"ImportPath": "github.com/codegangsta/cli",
-			"Comment": "v1.18.0",
-			"Rev": "1efa31f08b9333f1bd4882d61f9d668a70cd902e"
-		},
-		{
 			"ImportPath": "github.com/go-kit/kit/log",
 			"Comment": "v0.1.0-23-g25020e2",
 			"Rev": "25020e24479c2f15209bbcbeb4ea990feb452609"
@@ -106,6 +101,11 @@
 		{
 			"ImportPath": "golang.org/x/text/transform",
 			"Rev": "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
+		},
+		{
+			"ImportPath": "gopkg.in/urfave/cli.v1",
+			"Comment": "v1.18.0",
+			"Rev": "1efa31f08b9333f1bd4882d61f9d668a70cd902e"
 		}
 	]
 }
