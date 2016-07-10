@@ -8,5 +8,5 @@ dependencies:
         - docker build -t anarcher/glia:$CIRCLE_SHA1 . 
 test:
     override:
-        - docker run --entrypoint=go anarcher/glia:$CIRCLE_SHA1 test ./... -race
+        - docker run --entrypoint=go anarcher/glia:$CIRCLE_SHA1 test ./lib -race
 
