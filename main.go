@@ -3,10 +3,12 @@ package main
 import (
 	"github.com/anarcher/glia/lib"
 
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/net/context"
 	"gopkg.in/urfave/cli.v1"
 
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 )
@@ -15,6 +17,12 @@ func MainAction(c *cli.Context) error {
 	glia.Logger.Log("glia", "start", "version", Version, "gitcommit", GitCommit)
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	glia.Shutdown(cancelFunc)
+
+	//metric handler
+	http.Handle("/metrics", stdprometheus.Handler())
+	go func() {
+		glia.Logger.Log("err", http.ListenAndServe(c.String("metric_addr"), nil))
+	}()
 
 	fetchSignal := make(chan struct{})
 	metricCh := make(chan []byte)
@@ -135,6 +143,12 @@ func main() {
 			Value:  "ganglia",
 			Usage:  "The prefix to prepend to the metric names exported",
 			EnvVar: "GRAPHITE_PREFIX",
+		},
+		cli.StringFlag{
+			Name:   "metric_addr",
+			Value:  ":8002",
+			Usage:  "Prometheus metrics export addr",
+			EnvVar: "METRIC_ADDR",
 		},
 	}
 	app.Run(os.Args)

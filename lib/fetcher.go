@@ -1,6 +1,8 @@
 package glia
 
 import (
+	_metrics "github.com/anarcher/glia/lib/metrics"
+
 	"golang.org/x/net/context"
 
 	"bytes"
@@ -84,6 +86,7 @@ L:
 
 		case <-fetchSignal:
 			Logger.Log("fetch", "start")
+			_metrics.Fetching.Add(1)
 			st := time.Now()
 			if err := f.ConnectIfNot(); err == nil {
 				if err := f.fetch(metricCh, &metrics, &mb); err != nil {
@@ -92,6 +95,8 @@ L:
 				Logger.Log("fetch", "done", "elapsed", fmt.Sprintf("%s", time.Since(st)))
 			}
 			f.Disconnect()
+			_metrics.FetchLatency.Observe(time.Since(st))
+			_metrics.Fetching.Add(-1)
 		}
 	}
 
