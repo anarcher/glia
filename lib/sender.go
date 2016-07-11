@@ -1,9 +1,12 @@
 package glia
 
 import (
-	"net"
+	gliametrics "github.com/anarcher/glia/lib/metrics"
 
 	"golang.org/x/net/context"
+
+	"net"
+	"time"
 )
 
 type Sender struct {
@@ -67,12 +70,19 @@ L:
 		case <-s.ctx.Done():
 			break L
 		case metrics := <-metricCh:
+			gliametrics.Sending.Add(1)
+			st := time.Now()
+
 			if err := s.ConnectIfNot(); err == nil {
 				if _, err := s.conn.Write(metrics); err != nil {
+					gliametrics.SendErrorCount.Add(1)
 					Logger.Log("sender", "write", "err", err)
 					s.Disconnect()
 				}
 			}
+
+			gliametrics.SendLatency.Observe(time.Since(st))
+			gliametrics.Sending.Add(-1)
 		}
 	}
 

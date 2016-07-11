@@ -36,4 +36,18 @@ var (
 		Name:      "send_latency_microseconds",
 		Help:      "Total duration of sending in microseconds.",
 	}, []string{}))
+
+	FetchErrorCount = kitprometheus.NewCounter(stdprometheus.CounterOpts{
+		Namespace: "glia",
+		Subsystem: "fetcher",
+		Name:      "error_count",
+		Help:      "Total error count of fetching opertation",
+	}, []string{})
+
+	SendErrorCount = kitprometheus.NewCounter(stdprometheus.CounterOpts{
+		Namespace: "glia",
+		Subsystem: "sender",
+		Name:      "error_count",
+		Help:      "Total error count of sending opertation",
+	}, []string{})
 )
