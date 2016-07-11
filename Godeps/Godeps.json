@@ -1,7 +1,10 @@
 {
 	"ImportPath": "github.com/anarcher/glia",
 	"GoVersion": "go1.6",
-	"GodepVersion": "v72",
+	"GodepVersion": "v63",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/beorn7/perks/quantile",
