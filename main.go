@@ -11,6 +11,7 @@ import (
 
 	"fmt"
 	"net/http"
+	"net/http/pprof"
 	"os"
 	"time"
 )
@@ -22,6 +23,9 @@ func MainAction(c *cli.Context) error {
 
 	//metric handler
 	http.Handle("/metrics", stdprometheus.Handler())
+	//pprof handler
+	http.Handle("/debug/pprof", http.HandlerFunc(pprof.Index))
+
 	go func() {
 		glia.Logger.Log("err", http.ListenAndServe(c.String("metric_addr"), nil))
 	}()
