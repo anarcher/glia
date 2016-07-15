@@ -1,0 +1,10 @@
+version: '2'
+services:
+    gmond:
+        build: ./gmond/
+        ports:
+            - "8649:8649"
+    carbon:
+        image: lincolnloop/carbon-cache
+        ports:
+            - "2003:2003"
