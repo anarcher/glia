@@ -8,7 +8,8 @@ RUN apt-get upgrade -y
 # Install gmond aka ganglia-monitor
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y ganglia-monitor
 
-EXPOSE 8649
+EXPOSE 8649/udp
+EXPOSE 8649/tcp
 
 # Copy gmond.conf from the current Dockerfile directory to /etc/ganglia/gmond-template.conf
 ADD gmond.conf /etc/ganglia/gmond-template.conf

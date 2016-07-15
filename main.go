@@ -139,8 +139,8 @@ func main() {
 			EnvVar: "GRAPHITE_ADDR",
 		},
 		cli.StringFlag{
-			Name:   "graphtie_network",
-			Value:  "tcp",
+			Name:   "graphite_network",
+			Value:  "udp",
 			Usage:  "The network of graphite carbon",
 			EnvVar: "GRAPHITE_NETWORK",
 		},
