@@ -48,7 +48,7 @@ func MainAction(c *cli.Context) error {
 
 	var senders []*glia.Sender
 	{
-		network := c.String("graphtie_network")
+		network := c.String("graphite_network")
 		addr := c.String("graphite")
 		for i := 0; i < c.Int("sender"); i++ {
 			s := glia.NewSender(ctx, network, addr, metricCh)

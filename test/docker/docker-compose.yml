@@ -4,8 +4,8 @@ services:
         build: ./gmond/
         ports:
             - "8649:8649/tcp"
-            - "8649:8649/udp"
+            - "8666:8666/udp"
     carbon:
-        image: lincolnloop/carbon-cache
+        build: ./udp_server/
         ports:
-            - "2003:2003"
+            - "2013:2013/udp"
