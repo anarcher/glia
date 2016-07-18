@@ -18,6 +18,8 @@ const (
 	ATTR_NAME          = "NAME"
 	ATTR_TYPE          = "TYPE"
 	ATTR_VAL           = "VAL"
+	ATTR_TN            = "TN"
+	ATTR_TMAX          = "TMAX"
 	TYPE_VAL_STRING    = "string"
 	TYPE_VAL_TIMESTAMP = "timestamp"
 )
@@ -67,7 +69,7 @@ L:
 						}
 					}
 				case TAG_METRIC:
-					metric := makeMetric(&se, mb, namespaces, tsstr)
+					metric := f.makeMetric(&se, mb, namespaces, tsstr)
 					if len(metric) > 0 {
 						metrics.Write(metric)
 						metrics.WriteString("\n")
@@ -107,7 +109,13 @@ L:
 	return nil
 }
 
-func makeMetric(el *xml.StartElement, mb *bytes.Buffer, ns [][]byte, ts string) []byte {
+func (f *Fetcher) makeMetric(el *xml.StartElement, mb *bytes.Buffer, ns [][]byte, ts string) []byte {
+	var (
+		tn   int
+		tmax int
+		bs   []byte
+	)
+
 	for _, attr := range el.Attr {
 		if attr.Name.Local == ATTR_NAME {
 			mb.Write(bytes.Join(ns, []byte(".")))
@@ -118,15 +126,32 @@ func makeMetric(el *xml.StartElement, mb *bytes.Buffer, ns [][]byte, ts string) 
 			mb.WriteString(attr.Value)
 			mb.WriteString(" ")
 			mb.WriteString(ts)
+		} else if attr.Name.Local == ATTR_TN {
+			if f.ignoreMetricOverTmax {
+				var err error
+				if tn, err = strconv.Atoi(attr.Value); err != nil {
+					tn = -1
+				}
+			}
+		} else if attr.Name.Local == ATTR_TMAX {
+			if f.ignoreMetricOverTmax {
+				var err error
+				if tmax, err = strconv.Atoi(attr.Value); err != nil {
+					tmax = -1
+				}
+			}
 		} else if attr.Name.Local == ATTR_TYPE {
 			if attr.Value != TYPE_VAL_STRING && attr.Value != "" {
-				bs := make([]byte, mb.Len())
+				bs = make([]byte, mb.Len())
 				if _, err := mb.Read(bs); err != nil {
 					Logger.Log("err", err)
 				}
-				return bs
 			}
 		}
 	}
-	return nil
+
+	if tn > tmax && f.ignoreMetricOverTmax {
+		return []byte{}
+	}
+	return bs
 }

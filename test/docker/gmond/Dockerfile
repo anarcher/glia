@@ -6,7 +6,7 @@ RUN apt-get update
 RUN apt-get upgrade -y
 
 # Install gmond aka ganglia-monitor
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y ganglia-monitor
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y ganglia-monitor telnet netcat
 
 EXPOSE 8649/udp
 EXPOSE 8649/tcp

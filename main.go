@@ -39,8 +39,9 @@ func MainAction(c *cli.Context) error {
 		addr := c.String("gmond")
 		bufSize := c.Int("buffer_size")
 		graphitePrefix := c.String("graphite_prefix")
+		ignoreMetricOverTmax := c.Bool("ignore_metric_over_tmax")
 		for i := 0; i < c.Int("fetcher"); i++ {
-			f := glia.NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize, graphitePrefix)
+			f := glia.NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize, graphitePrefix, ignoreMetricOverTmax)
 			fetchers = append(fetchers, f)
 			glia.WaitGroup.Add(1)
 		}
@@ -149,6 +150,11 @@ func main() {
 			Value:  "ganglia",
 			Usage:  "The prefix to prepend to the metric names exported",
 			EnvVar: "GRAPHITE_PREFIX",
+		},
+		cli.BoolTFlag{
+			Name:   "ignore_metric_over_tmax",
+			Usage:  "Ignore metric over tmax",
+			EnvVar: "IGNORE_METRIC_OVER_TMAX",
 		},
 		cli.StringFlag{
 			Name:   "metric_addr",
