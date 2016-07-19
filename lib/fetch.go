@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/xml"
+	"net"
 	"strconv"
 	"time"
 )
@@ -24,8 +25,8 @@ const (
 	TYPE_VAL_TIMESTAMP = "timestamp"
 )
 
-func (f *Fetcher) fetch(metricCh chan []byte, metrics, mb *bytes.Buffer) error {
-	r := bufio.NewReader(f.conn)
+func (f *Fetcher) fetch(conn net.Conn, metricCh chan []byte, metrics, mb *bytes.Buffer) error {
+	r := bufio.NewReader(conn)
 
 	ts := time.Now().Unix()
 	tsstr := strconv.FormatInt(ts, 10)

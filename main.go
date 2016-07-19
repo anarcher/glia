@@ -153,13 +153,13 @@ func main() {
 		},
 		cli.BoolTFlag{
 			Name:   "ignore_metric_over_tmax",
-			Usage:  "Ignore metric over tmax",
+			Usage:  "enable or disable to ignore metric over tmax",
 			EnvVar: "IGNORE_METRIC_OVER_TMAX",
 		},
 		cli.StringFlag{
 			Name:   "metric_addr",
 			Value:  ":8002",
-			Usage:  "Prometheus metrics export addr",
+			Usage:  "The Prometheus metrics export addr",
 			EnvVar: "METRIC_ADDR",
 		},
 	}

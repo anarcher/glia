@@ -10,11 +10,10 @@ import (
 )
 
 type Sender struct {
-	ctx       context.Context
-	conn      net.Conn
-	network   string
-	addr      string
-	connected bool
+	ctx     context.Context
+	conn    net.Conn
+	network string
+	addr    string
 }
 
 func NewSender(ctx context.Context,
@@ -31,39 +30,52 @@ func NewSender(ctx context.Context,
 	return s
 }
 
-func (s *Sender) Connect() error {
+func (s *Sender) Connect() (net.Conn, error) {
 	c, err := net.Dial(s.network, s.addr)
 	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
+
+func (s *Sender) Disconnect(c net.Conn) error {
+	if c == nil {
+		return nil
+	}
+
+	if err := c.Close(); err != nil {
+		Logger.Log("sender", "disconnect", "err", err)
 		return err
 	}
 
-	s.conn = c
-	s.connected = true
 	return nil
 }
 
-func (s *Sender) Disconnect() error {
-	if s.connected == true && s.conn != nil {
-		if err := s.conn.Close(); err != nil {
-			Logger.Log("sender", "disconnect", "err", err)
-			return err
-		}
-		s.connected = false
+func (s *Sender) ConnectIfNot(c net.Conn, err error) (net.Conn, error) {
+	if c != nil && err == nil {
+		return c, err
 	}
-	return nil
-}
 
-func (s *Sender) ConnectIfNot() error {
-	if s.connected == false || s.conn == nil {
-		if err := s.Connect(); err != nil {
-			Logger.Log("sender", "connection", "err", err)
-			return err
+	if c != nil {
+		if err := s.Disconnect(c); err != nil {
+			return nil, err
 		}
 	}
-	return nil
+	var cErr error
+	if c, cErr = s.Connect(); cErr != nil {
+		Logger.Log("sender", "connection", "err", err)
+		return nil, err
+	}
+
+	return c, nil
 }
 
 func (s *Sender) looper(metricCh chan []byte) {
+	var (
+		conn net.Conn
+		err  error
+	)
 L:
 	for {
 		select {
@@ -73,11 +85,10 @@ L:
 			gliametrics.Sending.Add(1)
 			st := time.Now()
 
-			if err := s.ConnectIfNot(); err == nil {
-				if _, err := s.conn.Write(metrics); err != nil {
+			if conn, err = s.ConnectIfNot(conn, err); err == nil {
+				if _, err = conn.Write(metrics); err != nil {
 					gliametrics.SendErrorCount.Add(1)
 					Logger.Log("sender", "write", "err", err)
-					s.Disconnect()
 				}
 			}
 
@@ -86,7 +97,7 @@ L:
 		}
 	}
 
-	s.Disconnect()
+	s.Disconnect(conn)
 	WaitGroup.Done()
 	Logger.Log("sender", "done")
 }

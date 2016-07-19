@@ -7,6 +7,7 @@ import (
 
 	"bytes"
 	"fmt"
+	"io"
 	"net"
 	"time"
 )
@@ -15,8 +16,6 @@ type Fetcher struct {
 	ctx                  context.Context
 	network              string
 	addr                 string
-	conn                 net.Conn
-	connected            bool
 	flushCnt             int
 	graphitePrefix       string
 	ignoreMetricOverTmax bool
@@ -43,42 +42,53 @@ func NewFetcher(ctx context.Context,
 	return fetcher
 }
 
-func (f *Fetcher) Connect() error {
+func (f *Fetcher) Connect() (net.Conn, error) {
 	c, err := net.Dial(f.network, f.addr)
 	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
+
+func (f *Fetcher) Disconnect(c net.Conn) error {
+	if c == nil {
+		return nil
+	}
+
+	if err := c.Close(); err != nil {
+		Logger.Log("fetcher", "disconnect", "err", err)
 		return err
 	}
 
-	f.conn = c
-	f.connected = true
 	return nil
 }
 
-func (f *Fetcher) Disconnect() error {
-	if f.connected == true && f.conn != nil {
-		if err := f.conn.Close(); err != nil {
-			Logger.Log("fetcher", "disconnect", "err", err)
-			return err
-		}
-		f.connected = false
+func (f *Fetcher) ConnectIfNot(c net.Conn, err error) (net.Conn, error) {
+	if c != nil && err == nil {
+		return c, err
 	}
-	return nil
-}
 
-func (f *Fetcher) ConnectIfNot() error {
-	if f.connected == false || f.conn == nil {
-		if err := f.Connect(); err != nil {
-			Logger.Log("fetcher", "connect", "err", err)
-			return err
+	if c != nil {
+		if err := f.Disconnect(c); err != nil {
+			return nil, err
 		}
 	}
-	return nil
+	var cErr error
+	if c, cErr = f.Connect(); cErr != nil {
+		Logger.Log("sender", "connection", "err", err)
+		return nil, cErr
+	}
+
+	return c, nil
 }
 
 func (f *Fetcher) looper(fetchSignal chan struct{}, metricCh chan []byte) {
 	var (
 		metrics bytes.Buffer
 		mb      bytes.Buffer
+		conn    net.Conn
+		connErr error
 	)
 
 L:
@@ -91,20 +101,22 @@ L:
 			Logger.Log("fetch", "start")
 			gliametrics.Fetching.Add(1)
 			st := time.Now()
-			if err := f.ConnectIfNot(); err == nil {
-				if err := f.fetch(metricCh, &metrics, &mb); err != nil {
+			if conn, connErr = f.ConnectIfNot(conn, connErr); connErr == nil {
+				fmt.Println("conn", conn, "connErr", connErr)
+				if err := f.fetch(conn, metricCh, &metrics, &mb); err != nil {
 					gliametrics.FetchErrorCount.Add(1)
 					Logger.Log("fetch", "err", "err", err)
+				} else if err == io.EOF {
+					connErr = err
 				}
 				Logger.Log("fetch", "done", "elapsed", fmt.Sprintf("%s", time.Since(st)))
 			}
-			f.Disconnect()
 			gliametrics.FetchLatency.Observe(time.Since(st))
 			gliametrics.Fetching.Add(-1)
 		}
 	}
 
-	f.Disconnect()
+	f.Disconnect(conn)
 	WaitGroup.Done()
 	Logger.Log("fetcher", "done")
 }
