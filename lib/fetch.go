@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/xml"
+	"io"
 	"net"
 	"strconv"
 	"time"
@@ -46,12 +47,14 @@ L:
 		default:
 
 			t, err := decoder.Token()
+			if err != nil {
+				if err != io.EOF {
+					Logger.Log("fetch", "xml", "err", err)
+				}
+				return err
+			}
 			if t == nil {
 				break L
-			}
-			if err != nil {
-				Logger.Log("fetch", "xml", "err", err)
-				return err
 			}
 
 			switch se := t.(type) {

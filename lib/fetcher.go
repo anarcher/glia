@@ -101,13 +101,15 @@ L:
 			Logger.Log("fetch", "start")
 			gliametrics.Fetching.Add(1)
 			st := time.Now()
+
 			if conn, connErr = f.ConnectIfNot(conn, connErr); connErr == nil {
-				fmt.Println("conn", conn, "connErr", connErr)
 				if err := f.fetch(conn, metricCh, &metrics, &mb); err != nil {
 					gliametrics.FetchErrorCount.Add(1)
-					Logger.Log("fetch", "err", "err", err)
-				} else if err == io.EOF {
-					connErr = err
+					if err == io.EOF {
+						connErr = err
+					} else {
+						Logger.Log("fetch", "err", "err", err)
+					}
 				}
 				Logger.Log("fetch", "done", "elapsed", fmt.Sprintf("%s", time.Since(st)))
 			}
