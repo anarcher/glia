@@ -29,7 +29,7 @@ func testFetch(t *testing.T, fixture []byte) {
 		metricCh,
 		fetchCnt,
 		"test",
-		true)
+		false)
 
 	fetchSignal <- struct{}{}
 

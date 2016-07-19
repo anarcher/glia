@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/xml"
+	"io"
 	"net"
 	"strconv"
 	"time"
@@ -46,12 +47,15 @@ L:
 		default:
 
 			t, err := decoder.Token()
+			if err != nil {
+				if err != io.EOF {
+					Logger.Log("fetch", "xml", "err", err)
+				}
+				f.sendMetricCh(metricCh, metrics)
+				return err
+			}
 			if t == nil {
 				break L
-			}
-			if err != nil {
-				Logger.Log("fetch", "xml", "err", err)
-				return err
 			}
 
 			switch se := t.(type) {
@@ -87,26 +91,26 @@ L:
 			}
 
 			if idx >= f.flushCnt {
-				bs := make([]byte, metrics.Len())
-				if _, err := metrics.Read(bs); err != nil {
-					Logger.Log("err", err)
-				}
-				metricCh <- bs
-				metrics.Reset()
+				f.sendMetricCh(metricCh, metrics)
 				idx = 0
 			}
 		}
 	}
 
+	f.sendMetricCh(metricCh, metrics)
+	return nil
+}
+
+func (f *Fetcher) sendMetricCh(metricCh chan []byte, metrics *bytes.Buffer) error {
 	if metrics.Len() > 0 {
 		bs := make([]byte, metrics.Len())
 		if _, err := metrics.Read(bs); err != nil {
-			Logger.Log("err", err)
+			Logger.Log("fetcher", "ch", "err", err)
+			return err
 		}
 		metricCh <- bs
 		metrics.Reset()
 	}
-
 	return nil
 }
 
