@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+const FetchBufSize = 4096
+
 type Fetcher struct {
 	ctx                  context.Context
 	network              string

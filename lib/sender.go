@@ -85,10 +85,22 @@ L:
 			gliametrics.Sending.Add(1)
 			st := time.Now()
 
-			if conn, err = s.ConnectIfNot(conn, err); err == nil {
-				if _, err = conn.Write(metrics); err != nil {
+			var start, c int
+
+			for {
+				if conn, err = s.ConnectIfNot(conn, err); err == nil {
+					if c, err = conn.Write(metrics[start:]); err != nil {
+						gliametrics.SendErrorCount.Add(1)
+						Logger.Log("sender", "write", "err", err)
+					}
+					start += c
+					if c == 0 || start == len(metrics) {
+						break
+					}
+				} else {
 					gliametrics.SendErrorCount.Add(1)
 					Logger.Log("sender", "write", "err", err)
+					break
 				}
 			}
 
