@@ -51,6 +51,7 @@ L:
 				if err != io.EOF {
 					Logger.Log("fetch", "xml", "err", err)
 				}
+				f.sendMetricCh(metricCh, metrics)
 				return err
 			}
 			if t == nil {
@@ -90,26 +91,26 @@ L:
 			}
 
 			if idx >= f.flushCnt {
-				bs := make([]byte, metrics.Len())
-				if _, err := metrics.Read(bs); err != nil {
-					Logger.Log("err", err)
-				}
-				metricCh <- bs
-				metrics.Reset()
+				f.sendMetricCh(metricCh, metrics)
 				idx = 0
 			}
 		}
 	}
 
+	f.sendMetricCh(metricCh, metrics)
+	return nil
+}
+
+func (f *Fetcher) sendMetricCh(metricCh chan []byte, metrics *bytes.Buffer) error {
 	if metrics.Len() > 0 {
 		bs := make([]byte, metrics.Len())
 		if _, err := metrics.Read(bs); err != nil {
-			Logger.Log("err", err)
+			Logger.Log("fetcher", "ch", "err", err)
+			return err
 		}
 		metricCh <- bs
 		metrics.Reset()
 	}
-
 	return nil
 }
 
