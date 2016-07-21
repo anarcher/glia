@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const FetchBufSize = 4096
+const FetchBufSize = 2048
 
 type Fetcher struct {
 	ctx                  context.Context
