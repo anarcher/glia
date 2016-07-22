@@ -90,7 +90,7 @@ L:
 				}
 			}
 
-			if idx >= f.flushCnt || metrics.Len() >= FetchBufSize {
+			if idx >= f.flushCnt || metrics.Len() >= f.fetchBufSize {
 				f.sendMetricCh(metricCh, metrics)
 				idx = 0
 			}

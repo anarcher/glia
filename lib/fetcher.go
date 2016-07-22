@@ -21,6 +21,7 @@ type Fetcher struct {
 	flushCnt             int
 	graphitePrefix       string
 	ignoreMetricOverTmax bool
+	fetchBufSize         int
 }
 
 func NewFetcher(ctx context.Context,
@@ -28,7 +29,8 @@ func NewFetcher(ctx context.Context,
 	fetchSignal chan struct{}, metricCh chan []byte,
 	flushCnt int,
 	graphitePrefix string,
-	ignoreMetricOverTmax bool) *Fetcher {
+	ignoreMetricOverTmax bool,
+	fetchBufSize int) *Fetcher {
 
 	fetcher := &Fetcher{
 		ctx:                  ctx,
@@ -37,6 +39,10 @@ func NewFetcher(ctx context.Context,
 		flushCnt:             flushCnt,
 		graphitePrefix:       graphitePrefix,
 		ignoreMetricOverTmax: ignoreMetricOverTmax,
+		fetchBufSize:         fetchBufSize,
+	}
+	if fetchBufSize <= 0 {
+		fetcher.fetchBufSize = FetchBufSize
 	}
 
 	go fetcher.looper(fetchSignal, metricCh)

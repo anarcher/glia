@@ -40,8 +40,9 @@ func MainAction(c *cli.Context) error {
 		bufSize := c.Int("buffer_size")
 		graphitePrefix := c.String("graphite_prefix")
 		ignoreMetricOverTmax := c.Bool("ignore_metric_over_tmax")
+		fetch_buf_size := c.Int("fetch_buf_size")
 		for i := 0; i < c.Int("fetcher"); i++ {
-			f := glia.NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize, graphitePrefix, ignoreMetricOverTmax)
+			f := glia.NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize, graphitePrefix, ignoreMetricOverTmax, fetch_buf_size)
 			fetchers = append(fetchers, f)
 			glia.WaitGroup.Add(1)
 		}
@@ -155,6 +156,12 @@ func main() {
 			Name:   "ignore_metric_over_tmax",
 			Usage:  "enable or disable to ignore metric over tmax",
 			EnvVar: "IGNORE_METRIC_OVER_TMAX",
+		},
+		cli.IntFlag{
+			Name:   "fetch_buf_size",
+			Usage:  "flusing fetch buffer size (sending packet size)",
+			Value:  512,
+			EnvVar: "FETCH_BUF_SIZE",
 		},
 		cli.StringFlag{
 			Name:   "metric_addr",
