@@ -22,6 +22,7 @@ type Fetcher struct {
 	graphitePrefix       string
 	ignoreMetricOverTmax bool
 	fetchBufSize         int
+	fetchInterval        time.Duration
 }
 
 func NewFetcher(ctx context.Context,
@@ -30,7 +31,8 @@ func NewFetcher(ctx context.Context,
 	flushCnt int,
 	graphitePrefix string,
 	ignoreMetricOverTmax bool,
-	fetchBufSize int) *Fetcher {
+	fetchBufSize int,
+	fetchInterval time.Duration) *Fetcher {
 
 	fetcher := &Fetcher{
 		ctx:                  ctx,
@@ -40,6 +42,7 @@ func NewFetcher(ctx context.Context,
 		graphitePrefix:       graphitePrefix,
 		ignoreMetricOverTmax: ignoreMetricOverTmax,
 		fetchBufSize:         fetchBufSize,
+		fetchInterval:        fetchInterval,
 	}
 	if fetchBufSize <= 0 {
 		fetcher.fetchBufSize = FetchBufSize

@@ -33,6 +33,13 @@ func MainAction(c *cli.Context) error {
 	fetchSignal := make(chan struct{})
 	metricCh := make(chan []byte)
 
+	fetchInterval, err := time.ParseDuration(c.String("fetch_interval"))
+	if err != nil {
+		glia.Logger.Log("err", err)
+		cancelFunc()
+		return err
+	}
+
 	var fetchers []*glia.Fetcher
 	{
 		network := c.String("gmond_network")
@@ -42,7 +49,7 @@ func MainAction(c *cli.Context) error {
 		ignoreMetricOverTmax := c.Bool("ignore_metric_over_tmax")
 		fetch_buf_size := c.Int("fetch_buf_size")
 		for i := 0; i < c.Int("fetcher"); i++ {
-			f := glia.NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize, graphitePrefix, ignoreMetricOverTmax, fetch_buf_size)
+			f := glia.NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize, graphitePrefix, ignoreMetricOverTmax, fetch_buf_size, fetchInterval)
 			fetchers = append(fetchers, f)
 			glia.WaitGroup.Add(1)
 		}
@@ -60,15 +67,8 @@ func MainAction(c *cli.Context) error {
 	}
 
 	{
-		interval, err := time.ParseDuration(c.String("fetch_interval"))
-		if err != nil {
-			glia.Logger.Log("err", err)
-			cancelFunc()
-			return err
-		}
-
 		go func() {
-			tick := time.Tick(interval)
+			tick := time.Tick(fetchInterval)
 		L:
 			for {
 				select {

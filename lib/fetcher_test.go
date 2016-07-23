@@ -6,6 +6,7 @@ import (
 	"net"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/pusher/buddha/tcptest"
 	"golang.org/x/net/context"
@@ -30,7 +31,8 @@ func testFetch(t *testing.T, fixture []byte) {
 		fetchCnt,
 		"test",
 		false,
-		FetchBufSize)
+		FetchBufSize,
+		time.Minute)
 
 	fetchSignal <- struct{}{}
 
