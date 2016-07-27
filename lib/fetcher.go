@@ -109,7 +109,6 @@ L:
 			break L
 
 		case <-fetchSignal:
-			Logger.Log("fetch", "start")
 			gliametrics.Fetching.Add(1)
 			st := time.Now()
 

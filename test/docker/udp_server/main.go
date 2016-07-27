@@ -24,7 +24,7 @@ func main() {
 	CheckError(err)
 	defer ServerConn.Close()
 
-	buf := make([]byte, 1024)
+	buf := make([]byte, 2048)
 
 	for {
 		n, addr, err := ServerConn.ReadFromUDP(buf)

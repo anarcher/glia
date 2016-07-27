@@ -75,7 +75,6 @@ func MainAction(c *cli.Context) error {
 				case <-ctx.Done():
 					break L
 				case <-tick:
-					glia.Logger.Log("fetch", "event", "fire", true)
 					fetchSignal <- struct{}{}
 				}
 			}
@@ -112,7 +111,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "fetch_interval,i",
-			Value:  "1m",
+			Value:  "10s",
 			Usage:  "The duration of to fetch  from gmond",
 			EnvVar: "FETCH_INTERVAL",
 		},
@@ -160,7 +159,7 @@ func main() {
 		cli.IntFlag{
 			Name:   "fetch_buf_size",
 			Usage:  "flusing fetch buffer size (sending packet size)",
-			Value:  512,
+			Value:  1024,
 			EnvVar: "FETCH_BUF_SIZE",
 		},
 		cli.StringFlag{
