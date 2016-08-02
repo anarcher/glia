@@ -44,12 +44,12 @@ func MainAction(c *cli.Context) error {
 	{
 		network := c.String("gmond_network")
 		addr := c.String("gmond")
-		bufSize := c.Int("buffer_size")
+		bufItemCnt := c.Int("buffer_item_count")
 		graphitePrefix := c.String("graphite_prefix")
 		ignoreMetricOverTmax := c.Bool("ignore_metric_over_tmax")
 		fetch_buf_size := c.Int("fetch_buf_size")
 		for i := 0; i < c.Int("fetcher"); i++ {
-			f := glia.NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufSize, graphitePrefix, ignoreMetricOverTmax, fetch_buf_size, fetchInterval)
+			f := glia.NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufItemCnt, graphitePrefix, ignoreMetricOverTmax, fetch_buf_size, fetchInterval)
 			fetchers = append(fetchers, f)
 			glia.WaitGroup.Add(1)
 		}
@@ -111,14 +111,14 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "fetch_interval,i",
-			Value:  "10s",
+			Value:  "15s",
 			Usage:  "The duration of to fetch  from gmond",
 			EnvVar: "FETCH_INTERVAL",
 		},
 		cli.IntFlag{
-			Name:   "buffer_size,b",
+			Name:   "buffer_item_count,b",
 			Value:  1000,
-			Usage:  "The buffer size of sending (the number of metric line)",
+			Usage:  "The buffer item count of sending (the number of metric line)",
 			EnvVar: "BUFFER_SIZE",
 		},
 		cli.StringFlag{
@@ -141,7 +141,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "graphite_network",
-			Value:  "udp",
+			Value:  "tcp",
 			Usage:  "The network of graphite carbon",
 			EnvVar: "GRAPHITE_NETWORK",
 		},
@@ -153,13 +153,13 @@ func main() {
 		},
 		cli.BoolTFlag{
 			Name:   "ignore_metric_over_tmax",
-			Usage:  "enable or disable to ignore metric over tmax",
+			Usage:  "The flag of to enable or disable to ignore metric over tmax",
 			EnvVar: "IGNORE_METRIC_OVER_TMAX",
 		},
 		cli.IntFlag{
 			Name:   "fetch_buf_size",
-			Usage:  "flusing fetch buffer size (sending packet size)",
-			Value:  1024,
+			Usage:  "Flusing fetch buffer bytes size (sending packet size)",
+			Value:  2048,
 			EnvVar: "FETCH_BUF_SIZE",
 		},
 		cli.StringFlag{
