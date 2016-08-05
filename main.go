@@ -47,9 +47,10 @@ func MainAction(c *cli.Context) error {
 		bufItemCnt := c.Int("buffer_item_count")
 		graphitePrefix := c.String("graphite_prefix")
 		ignoreMetricOverTmax := c.Bool("ignore_metric_over_tmax")
-		fetch_buf_size := c.Int("fetch_buf_size")
+		fetchBufSize := c.Int("fetch_buf_size")
+		clusterName := c.String("cluster_name")
 		for i := 0; i < c.Int("fetcher"); i++ {
-			f := glia.NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufItemCnt, graphitePrefix, ignoreMetricOverTmax, fetch_buf_size, fetchInterval)
+			f := glia.NewFetcher(ctx, network, addr, fetchSignal, metricCh, bufItemCnt, graphitePrefix, ignoreMetricOverTmax, fetchBufSize, fetchInterval, clusterName)
 			fetchers = append(fetchers, f)
 			glia.WaitGroup.Add(1)
 		}
@@ -111,7 +112,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "fetch_interval,i",
-			Value:  "15s",
+			Value:  "10s",
 			Usage:  "The duration of to fetch  from gmond",
 			EnvVar: "FETCH_INTERVAL",
 		},
@@ -167,6 +168,12 @@ func main() {
 			Value:  ":8002",
 			Usage:  "The Prometheus metrics export addr",
 			EnvVar: "METRIC_ADDR",
+		},
+		cli.StringFlag{
+			Name:   "cluster_name",
+			Value:  "",
+			Usage:  "The cluster name to force setting (for testing mainly)",
+			EnvVar: "CLUSTER_NAME",
 		},
 	}
 	app.Run(os.Args)

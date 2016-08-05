@@ -22,6 +22,7 @@ const (
 	ATTR_VAL           = "VAL"
 	ATTR_TN            = "TN"
 	ATTR_TMAX          = "TMAX"
+	ATTR_LOCALTIME     = "LOCALTIME"
 	TYPE_VAL_STRING    = "string"
 	TYPE_VAL_TIMESTAMP = "timestamp"
 )
@@ -38,6 +39,8 @@ func (f *Fetcher) fetch(conn net.Conn, metricCh chan []byte, metrics, mb *bytes.
 	idx := 0
 	var namespaces [][]byte
 	namespaces = append(namespaces, []byte(f.graphitePrefix))
+
+	var tn int
 
 L:
 	for {
@@ -64,21 +67,37 @@ L:
 				case TAG_CLUSTER:
 					for _, attr := range se.Attr {
 						if attr.Name.Local == ATTR_NAME {
-							namespaces = append(namespaces, []byte(attr.Value))
+							if f.clusterName != "" {
+								namespaces = append(namespaces, []byte(f.clusterName))
+							} else {
+								namespaces = append(namespaces, []byte(attr.Value))
+							}
+						} else if attr.Name.Local == ATTR_LOCALTIME {
+							ts, _ = strconv.ParseInt(attr.Value, 10, 64)
+							tsstr = attr.Value
 						}
 					}
 				case TAG_HOST:
 					for _, attr := range se.Attr {
 						if attr.Name.Local == ATTR_NAME {
 							namespaces = append(namespaces, []byte(attr.Value))
+						} else if attr.Name.Local == ATTR_TN {
+							if f.ignoreMetricOverTmax {
+								var err error
+								if tn, err = strconv.Atoi(attr.Value); err != nil {
+									tn = -1
+								}
+							}
 						}
 					}
 				case TAG_METRIC:
-					metric := f.makeMetric(&se, mb, namespaces, tsstr)
-					if len(metric) > 0 {
-						metrics.Write(metric)
-						metrics.WriteString("\n")
-						idx++
+					if !f.ignoreMetricOverTmax || (f.ignoreMetricOverTmax && tn <= int(f.fetchInterval.Seconds())) {
+						metric := f.makeMetric(&se, mb, namespaces, ts, tsstr)
+						if len(metric) > 0 {
+							metrics.Write(metric)
+							metrics.WriteString("\n")
+							idx++
+						}
 					}
 				}
 
@@ -114,7 +133,7 @@ func (f *Fetcher) sendMetricCh(metricCh chan []byte, metrics *bytes.Buffer) erro
 	return nil
 }
 
-func (f *Fetcher) makeMetric(el *xml.StartElement, mb *bytes.Buffer, ns [][]byte, ts string) []byte {
+func (f *Fetcher) makeMetric(el *xml.StartElement, mb *bytes.Buffer, ns [][]byte, ts int64, tsstr string) []byte {
 	var (
 		tn   int
 		tmax int
@@ -130,7 +149,7 @@ func (f *Fetcher) makeMetric(el *xml.StartElement, mb *bytes.Buffer, ns [][]byte
 			mb.WriteString(" ")
 			mb.WriteString(attr.Value)
 			mb.WriteString(" ")
-			mb.WriteString(ts)
+			mb.WriteString(tsstr)
 		} else if attr.Name.Local == ATTR_TN {
 			if f.ignoreMetricOverTmax {
 				var err error
@@ -155,8 +174,10 @@ func (f *Fetcher) makeMetric(el *xml.StartElement, mb *bytes.Buffer, ns [][]byte
 		}
 	}
 
-	if tn > tmax+int(f.fetchInterval.Seconds()) && f.ignoreMetricOverTmax {
-		return []byte{}
+	if f.ignoreMetricOverTmax {
+		if tn >= tmax {
+			return []byte{}
+		}
 	}
 	return bs
 }
