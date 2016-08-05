@@ -175,7 +175,7 @@ func (f *Fetcher) makeMetric(el *xml.StartElement, mb *bytes.Buffer, ns [][]byte
 	}
 
 	if f.ignoreMetricOverTmax {
-		if tn >= tmax {
+		if tn > 0 && tmax > 0 && tn > tmax {
 			return []byte{}
 		}
 	}
