@@ -32,7 +32,8 @@ func testFetch(t *testing.T, fixture []byte) {
 		"test",
 		false,
 		FetchBufSize,
-		time.Minute)
+		time.Minute,
+		"")
 
 	fetchSignal <- struct{}{}
 
